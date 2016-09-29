@@ -392,7 +392,7 @@ private:
       TAsyncEventReason.NORMAL;
     (*(cast(TSocketEventListener*)arg))(reason);
     GC.removeRange(arg);
-    clear(arg);
+    destroy(arg);
     free(arg);
   }
 
@@ -402,7 +402,7 @@ private:
     assert(flags & EV_TIMEOUT);
     (*(cast(void delegate()*)arg))();
     GC.removeRange(arg);
-    clear(arg);
+    destroy(arg);
     free(arg);
   }
 
@@ -442,8 +442,9 @@ private:
 
 private {
   timeval toTimeval(const(Duration) dur) {
-    timeval tv = {tv_sec: cast(int)dur.total!"seconds"(),
-      tv_usec: dur.fracSec.usecs};
+    long seconds, usecs;
+    dur.split!("seconds", "usecs")(seconds, usecs);
+    timeval tv = {tv_sec: seconds, tv_usec: usecs};
     return tv;
   }
 

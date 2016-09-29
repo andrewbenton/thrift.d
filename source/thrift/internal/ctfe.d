@@ -91,6 +91,6 @@ unittest {
   static assert(ctfeToString(double.nan) == "nan");
   static assert(ctfeToString(0.0) == "0");
   static assert(ctfeToString(-0.0) == "-0");
-  static assert(ctfeToString(3.1415) == "3.1415");
+  static assert(ctfeToString(3.14) == "3.14");
   static assert(ctfeToString(2e-200) == "2e-200");
 }

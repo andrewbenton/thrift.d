@@ -103,8 +103,30 @@ template ChangeFuncAttrs(
 
 version (unittest) {
   import std.algorithm;
-  import std.metastrings;
+  //import std.metastrings;
   import std.typetuple;
+
+  string printFA(FunctionAttribute fa)
+  {
+    import std.format : format;
+    string ret = "{ ";
+    bool first = true;
+    foreach(f; EnumMembers!FunctionAttribute)
+    {
+      if((fa & f) == f)
+      {
+        if(first)
+          first = false;
+        else
+          ret ~= ", ";
+
+        ret ~= "%s".format(f);
+      }
+    }
+    ret ~= " }";
+
+    return ret;
+  }
 }
 unittest {
   alias FunctionAttribute FA;
@@ -117,11 +139,13 @@ unittest {
     static assert(functionAttributes!T1 == FA.safe);
 
     alias ChangeFuncAttrs!(T1, FA.nothrow_ | FA.ref_, FA.safe) T2;
-    static assert(functionAttributes!T2 == (FA.nothrow_ | FA.ref_));
+    static assert(functionAttributes!T2 == (FA.nothrow_ | FA.ref_ | FA.system));
 
     enum allAttrs = reduce!"a | b"([EnumMembers!FA]) & ~FA.safe;
 
     alias ChangeFuncAttrs!(T2, allAttrs) T3;
+    pragma(msg, printFA(functionAttributes!T3));
+    pragma(msg, printFA(allAttrs));
     static assert(functionAttributes!T3 == allAttrs);
 
     alias ChangeFuncAttrs!(T3, FA.none, allAttrs) T4;
